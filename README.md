@@ -25,7 +25,7 @@ The sheet
 ![Reedme 5](https://user-images.githubusercontent.com/54468620/207138239-cdc443b9-4445-460d-be38-44a50c4ec18b.jpg)
 
 ### The Script 
-1. The script clears the sheet using the clear_sheet function, clear_sheet requires two inputs.
+1. The script clears sheet using the clear_sheet function, clear_sheet requires two inputs.
 ```Python
 clear_sheet(file_path_func,sheet_name_func)
  ```
@@ -39,3 +39,11 @@ create_sheet(file_path_func,sheet_name_func,input_path_func)
 * sheet_name_func >The sheet name 
 * input_path_func >The file path of the input data 
 
+# Technical Details
+## Dependencies
+```
+  - openpyxl=3.0.10
+  - pandas=1.4.3
+  - pywin32=302
+  - xlwings=0.24.9
+```

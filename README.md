@@ -26,16 +26,16 @@ The sheet
 
 ### The Script 
 1. The script clears the sheet using the clear_sheet function, clear_sheet requires two inputs.
+```Python
+clear_sheet(file_path_func,sheet_name_func)
+ ```
 * file_path_func > The file path 
 * sheet_name_func > The sheet name 
-```Python
-def clear_sheet(file_path_func,sheet_name_func): 
- ```
 2. The script creates a sheet using the create_sheet function,  create_sheet requires three inputs.
+```Python
+create_sheet(file_path_func,sheet_name_func,input_path_func)
+ ```
 * file_path_func > The file path 
 * sheet_name_func >The sheet name 
 * input_path_func >The file path of the input data 
-```Python
-def create_sheet(file_path_func,sheet_name_func,input_path_func):
- ```
 

@@ -81,3 +81,61 @@ Using xlwings the sheet is cleared up until  "last_col" coordinate, excluding th
 ```python
 sheet[1:,0:last_col].clear_contents()) 
 ```
+<details><summary>create_sheet</summary>
+<p>
+
+```python
+def create_sheet(file_path_func,sheet_name_func,input_path_func):
+    
+    if isinstance(input_path_func,pd.DataFrame):
+        df_input = input_path_func
+    else:
+        df_input = pd.read_excel(input_path_func)
+    
+    df_bcf = pd.read_excel(file_path_func,  sheet_name =sheet_name_func )
+    mid_point = df_bcf.columns.str.contains('Unnamed').tolist().index(True)
+    df_bcf = df_bcf.iloc[:,0:mid_point]
+    
+    columns = df_bcf.columns 
+    df_bcf = df_bcf.iloc[0:0]
+    df_bcf.columns =range(df_bcf.shape[1])
+    df_input.columns = range(df_input.shape[1]) 
+    df_output = pd.concat([df_bcf,df_input])
+    df_output.columns = columns 
+    
+    wb = xw.Book(file_path_func)
+    sheet = wb.sheets[sheet_name_func]
+    
+    formula_dict = {}
+    for cell in range(mid_point, mid_point + 50):
+        key = sheet[0:1,cell:cell+1].formula
+        value = sheet[1:2,cell:cell+1].formula
+        formula_dict[key]=value
+    
+    formula_list = list(formula_dict.keys())
+    bcf_list = columns 
+    for bcf_header in bcf_list:
+        for formula_header in formula_list:
+            if bcf_header == formula_header:
+                df_output[bcf_header] = formula_dict[bcf_header]
+    df_output=df_output.set_index(df_output.columns[0]) 
+    sheet.range("A2").options(pd.DataFrame,header = False, expand = 'table',chunksize=1000).value = df_output
+```
+</p>
+</details>
+
+create_sheet starts by checking if the input variable "input_path_func" is an excel sheet or a pandas dataframe, this allows the function to accept both as input variables, ultimately the input is converted into a dataframe.
+ ```python
+if isinstance(input_path_func,pd.DataFrame):
+        df_input = input_path_func
+    else:
+        df_input = pd.read_excel(input_path_func) 
+```
+
+The data frame is used to find the first column header titled "untitled", this header is converted to a coordinate and stored in the variable "mid_point".The "mid_point" coordinate is used to create a dataframe titled "df_bcf", "df_bcf" is then cut off to not include any data beyond "mid_point".
+
+```python
+df_bcf = pd.read_excel(file_path_func,  sheet_name =sheet_name_func )
+mid_point = df_bcf.columns.str.contains('Unnamed').tolist().index(True)
+df_bcf = df_bcf.iloc[:,0:mid_point] 
+```

@@ -124,7 +124,7 @@ def create_sheet(file_path_func,sheet_name_func,input_path_func):
 </p>
 </details>
 
-create_sheet starts by checking if the input variable "input_path_func" is an excel sheet or a pandas dataframe, this allows the function to accept both as input variables, ultimately the input is converted into a dataframe.
+create_sheet starts by checking if the input variable "input_path_func" is an excel sheet or a pandas dataframe, this allows the function to accept both as input variables, ultimately the input is converted into a dataframe titled "df_input"
  ```python
 if isinstance(input_path_func,pd.DataFrame):
         df_input = input_path_func
@@ -132,10 +132,50 @@ if isinstance(input_path_func,pd.DataFrame):
         df_input = pd.read_excel(input_path_func) 
 ```
 
-The data frame is used to find the first column header titled "untitled", this header is converted to a coordinate and stored in the variable "mid_point".The "mid_point" coordinate is used to create a dataframe titled "df_bcf", "df_bcf" is then cut off to not include any data beyond "mid_point".
+A dataframe titled "df_bcf" is created from the "file_path_func" and "sheet_name_func" input into the function. The data frame is used to find the first column header titled "untitled", this header is converted to a coordinate and stored in the variable "mid_point".The "mid_point" coordinate is used to cut off "df_bcf" to not include any data beyond "mid_point".
 
 ```python
 df_bcf = pd.read_excel(file_path_func,  sheet_name =sheet_name_func )
 mid_point = df_bcf.columns.str.contains('Unnamed').tolist().index(True)
 df_bcf = df_bcf.iloc[:,0:mid_point] 
 ```
+
+The script creates a new dataframe titled "df_output" by renaming the columns of "df_bcf" and "df_input" to numbers based on there location, "df_bcf" and "df_input" are then concated together as "df_output"."df_output" columns are renamed to the original "df_bcf" column names. This process essentially creates a dataframe with the data from "df_input" and the column headers from "df_bcf"
+
+```python
+columns = df_bcf.columns 
+df_bcf = df_bcf.iloc[0:0]
+df_bcf.columns =range(df_bcf.shape[1])
+df_input.columns = range(df_input.shape[1]) 
+df_output = pd.concat([df_bcf,df_input])
+df_output.columns = columns
+```
+
+A dictionary is created titled "formula_dict", and every formula in the formula bank is added with the key as the formula name & the formula as the value. 
+
+```python
+formula_dict = {}
+for cell in range(mid_point, mid_point + 50):
+    key = sheet[0:1,cell:cell+1].formula
+    value = sheet[1:2,cell:cell+1].formula
+    formula_dict[key]=value
+```
+
+The columns of "df_output" and keys of "formula_dict" are cross referenced, where the "df_output" column header and the "formula_dict" key matches, the column is filled with the corresponding formula value.
+
+```python
+formula_list = list(formula_dict.keys())
+bcf_list = columns 
+for bcf_header in bcf_list:
+     for formula_header in formula_list:
+         if bcf_header == formula_header:
+             df_output[bcf_header] = formula_dict[bcf_header]
+```
+
+"df_output" has the index column removed and is then pasted into the file "file_path_func" on sheet "sheet_name_func"
+
+```python
+df_output=df_output.set_index(df_output.columns[0]) 
+sheet.range("A2").options(pd.DataFrame,header = False, expand = 'table',chunksize=1000).value = df_output
+```
+

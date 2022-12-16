@@ -1,4 +1,14 @@
 # Excel Automation
+<details><summary>Click for Script</summary>
+<p>
+
+```python
+create_sheet(file_path_func,sheet_name_func,input_path_func)
+```
+
+</p>
+</details>
+
 ## The project/problem 
 In my current role I was asked to refresh data within excel sheets on a monthly basis, this was done during a time critical period, due to the size of the data, the amount of sheets that required a refresh the process was eating into my resources.
 ## The Project Requirements 
@@ -46,4 +56,28 @@ create_sheet(file_path_func,sheet_name_func,input_path_func)
   - pandas=1.4.3
   - pywin32=302
   - xlwings=0.24.9
+```
+## How the Script works
+<details><summary>clear_sheet</summary>
+<p>
+
+```python
+def clear_sheet(file_path_func,sheet_name_func): 
+    df = pd.read_excel(file_path_func,  sheet_name =sheet_name_func )
+    last_col = df.columns.str.contains('Unnamed').tolist().index(True) 
+    sheet = wb.sheets[sheet_name_func]
+    sheet[1:,0:last_col].clear_contents()
+```
+
+</p>
+</details>
+The "clear_sheet" function works by loading the excel sheet into a pandas data frame then finding the first column header titled "untitled", this header is converted to a coordinate and stored in the variable "last_col"
+
+```python
+df = pd.read_excel(file_path_func,  sheet_name =sheet_name_func )
+last_col = df.columns.str.contains('Unnamed').tolist().index(True) 
+```
+Using xlwings the sheet is cleared up until  "last_col" coordinate, excluding the column headers
+```python
+sheet[1:,0:last_col].clear_contents()) 
 ```
